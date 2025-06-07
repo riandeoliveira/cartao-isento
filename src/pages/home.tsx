@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { SuggestedCreditCard } from "../components/suggested-credit-card";
 import { toBrazilianNumber } from "../utils/numeric";
 import { RecommendedCreditCard } from "../components/recommended-credit-card";
+import { ContactModal } from "../components/contact-modal";
 
 type SearchForm = {
   income?: number;
@@ -61,13 +62,23 @@ export const Home = (): ReactElement => {
 
     setIsLoading(true);
 
-    const { recomendados, sugestoesGastos, sugestoesInvestimentos } = await getRecommendedCreditCards({
+    const response = await getRecommendedCreditCards({
       amountInvested,
       expensesPerInvoice,
       income,
       banks,
       brands
     });
+
+    if (!response) {
+      toast.error("Ocorreu um erro desconhecido! Por favor, tente novamente mais tarde ou entre em contato conosco.");
+
+      setIsLoading(false);
+
+      return;
+    }
+
+    const { recomendados, sugestoesInvestimentos, sugestoesGastos } = response;
 
     const points = recomendados.map((item) => item.pontosPorDolar);
     const cashbacks = recomendados.map((item) => item.cashback);
@@ -220,8 +231,9 @@ export const Home = (): ReactElement => {
           <div className="flex my-14 justify-center">
             <button
               type="button"
+              disabled={isLoading}
               onClick={handleGetRecommendedCreditCards}
-              className="bg-linear-to-r from-c-light-blue to-c-dark-blue px-8 py-3 rounded-4xl cursor-pointer text-white font-bold hover:scale-90 transition-transform"
+              className="bg-linear-to-r from-c-light-blue to-c-dark-blue px-8 py-3 rounded-4xl cursor-pointer text-white font-bold hover:scale-90 transition-transform disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? "Buscando..." : "Encontrar"}
             </button>
@@ -317,6 +329,7 @@ export const Home = (): ReactElement => {
         </div>
       </div>
       <InfoDialog />
+      <ContactModal />
     </>
   )
 }

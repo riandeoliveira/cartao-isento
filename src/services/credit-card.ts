@@ -34,7 +34,7 @@ export type GetRecommendedCreditCardsResponse = {
   sugestoesInvestimentos: CreditCard[];
 }
 
-export const getRecommendedCreditCards = async (request: GetRecommendedCreditCardsRequest) => {
+export const getRecommendedCreditCards = async (request: GetRecommendedCreditCardsRequest): Promise<GetRecommendedCreditCardsResponse | null> => {
   const { income, amountInvested, expensesPerInvoice, banks, brands } = request;
 
   const params = new URLSearchParams({
@@ -58,6 +58,6 @@ export const getRecommendedCreditCards = async (request: GetRecommendedCreditCar
   } catch (error) {
     console.error("Erro na requisição:", error);
 
-    throw error;
+    return null;
   }
 }
